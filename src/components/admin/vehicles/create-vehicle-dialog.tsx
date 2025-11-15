@@ -54,6 +54,8 @@ export function CreateVehicleDialog({
       pricePerDay: '',
       description: '',
       imageUrl: '',
+      discountPercent: '0',
+      insurance: '50',
     },
   })
 
@@ -69,7 +71,9 @@ export function CreateVehicleDialog({
         parseFloat(data.pricePerDay),
         undefined,
         data.description,
-        data.imageUrl
+        data.imageUrl,
+        data.discountPercent ? parseFloat(data.discountPercent) : undefined,
+        data.insurance ? parseFloat(data.insurance) : undefined
       )
 
       if (!result.success) {
@@ -149,18 +153,51 @@ export function CreateVehicleDialog({
             )}
           </div>
 
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="pricePerDay">Price Per Day ($) *</Label>
+              <Input
+                id="pricePerDay"
+                type="number"
+                step="0.01"
+                min="0"
+                placeholder="99.99"
+                {...register('pricePerDay')}
+              />
+              {errors.pricePerDay && (
+                <p className="text-sm text-red-600">{errors.pricePerDay.message}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="discountPercent">Discount (%)</Label>
+              <Input
+                id="discountPercent"
+                type="number"
+                step="0.01"
+                min="0"
+                max="100"
+                placeholder="0"
+                {...register('discountPercent')}
+              />
+              {errors.discountPercent && (
+                <p className="text-sm text-red-600">{errors.discountPercent.message}</p>
+              )}
+            </div>
+          </div>
+
           <div className="space-y-2">
-            <Label htmlFor="pricePerDay">Price Per Day ($) *</Label>
+            <Label htmlFor="insurance">Insurance ($)</Label>
             <Input
-              id="pricePerDay"
+              id="insurance"
               type="number"
               step="0.01"
               min="0"
-              placeholder="99.99"
-              {...register('pricePerDay')}
+              placeholder="50"
+              {...register('insurance')}
             />
-            {errors.pricePerDay && (
-              <p className="text-sm text-red-600">{errors.pricePerDay.message}</p>
+            {errors.insurance && (
+              <p className="text-sm text-red-600">{errors.insurance.message}</p>
             )}
           </div>
 

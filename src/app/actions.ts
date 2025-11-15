@@ -490,7 +490,9 @@ export async function createVehicle(
   pricePerDay: number,
   agencyId?: string,
   description?: string,
-  imageUrl?: string
+  imageUrl?: string,
+  discountPercent?: number,
+  insurance?: number
 ) {
   try {
     const { data, error } = await supabase
@@ -507,7 +509,8 @@ export async function createVehicle(
           available: true,
           rating_avg: 0,
           rating_count: 0,
-          insurance: 0,
+          discount_percent: discountPercent || 0,
+          insurance: insurance || 50,
           offer_active: false,
         }
       ])

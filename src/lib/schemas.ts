@@ -130,6 +130,8 @@ export const createVehicleFormSchema = z.object({
   pricePerDay: z.string().refine((val) => !isNaN(parseFloat(val)) && parseFloat(val) >= 0, 'Price must be a positive number'),
   description: z.string().optional(),
   imageUrl: z.string().url('Must be a valid URL').optional().or(z.literal('')),
+  discountPercent: z.string().refine((val) => !isNaN(parseFloat(val)) && parseFloat(val) >= 0 && parseFloat(val) <= 100, 'Discount must be between 0-100').optional(),
+  insurance: z.string().refine((val) => !isNaN(parseFloat(val)) && parseFloat(val) >= 0, 'Insurance must be a positive number').optional(),
 })
 
 export type CreateVehicleFormData = z.infer<typeof createVehicleFormSchema>

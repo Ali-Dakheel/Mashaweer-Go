@@ -129,25 +129,38 @@ export function CreateRatingDialog({
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="vehicleId">Vehicle ID *</Label>
-            <Input
-              id="vehicleId"
-              placeholder="Enter vehicle UUID"
-              {...register('vehicleId')}
-            />
+            <Label htmlFor="vehicleId">Vehicle *</Label>
+            <Select value={vehicleIdValue} onValueChange={(value) => setValue('vehicleId', value)}>
+              <SelectTrigger id="vehicleId" disabled={isLoading}>
+                <SelectValue placeholder={isLoading ? 'Loading vehicles...' : 'Select a vehicle'} />
+              </SelectTrigger>
+              <SelectContent>
+                {vehicles.map((vehicle) => (
+                  <SelectItem key={vehicle.id} value={vehicle.id}>
+                    {vehicle.vehicle_name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             {errors.vehicleId && (
               <p className="text-sm text-red-600">{errors.vehicleId.message}</p>
             )}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="userId">User ID *</Label>
-            <Input
-              id="userId"
-              type="number"
-              placeholder="Enter user ID"
-              {...register('userId')}
-            />
+            <Label htmlFor="userId">User *</Label>
+            <Select value={userIdValue} onValueChange={(value) => setValue('userId', value)}>
+              <SelectTrigger id="userId" disabled={isLoading}>
+                <SelectValue placeholder={isLoading ? 'Loading users...' : 'Select a user'} />
+              </SelectTrigger>
+              <SelectContent>
+                {users.map((user) => (
+                  <SelectItem key={user.id} value={user.id.toString()}>
+                    {user.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             {errors.userId && (
               <p className="text-sm text-red-600">{errors.userId.message}</p>
             )}
@@ -190,12 +203,12 @@ export function CreateRatingDialog({
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
-              disabled={isSubmitting}
+              disabled={isSubmitting || isLoading}
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            <Button type="submit" disabled={isSubmitting || isLoading}>
+              {(isSubmitting || isLoading) && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Create Rating
             </Button>
           </div>
