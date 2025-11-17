@@ -1,9 +1,96 @@
 'use server'
 
-import { revalidatePath } from 'next/cache'
+import { revalidatePath, redirect } from 'next/cache'
 import { z } from 'zod'
+import bcrypt from 'bcryptjs'
 import { supabase } from '@/lib/supabase-server'
-import { userSchema, agencySchema, vehicleSchema, ratingSchema } from '@/lib/schemas'
+import { userSchema, agencySchema, vehicleSchema, ratingSchema, loginFormSchema } from '@/lib/schemas'
+import { createSessionCookie, deleteSessionCookie } from '@/lib/auth'
+
+// ============================================================================
+// AUTHENTICATION
+// ============================================================================
+
+export async function loginUser(email: string, password: string) {
+  try {
+    // Validate input
+    const validationResult = loginFormSchema.safeParse({ email, password })
+    if (!validationResult.success) {
+      return {
+        success: false,
+        error: validationResult.error.errors[0].message || 'Invalid input',
+      }
+    }
+
+    // Fetch user from database
+    const { data: users, error: fetchError } = await supabase
+      .from('Users')
+      .select('id, name, email, password, "Role"')
+      .eq('email', email)
+      .single()
+
+    if (fetchError || !users) {
+      return {
+        success: false,
+        error: 'Invalid email or password',
+      }
+    }
+
+    // Check if user is admin
+    if (users.Role !== 'admin') {
+      return {
+        success: false,
+        error: 'Only admin users can access this application',
+      }
+    }
+
+    // Verify password using bcryptjs (password is hashed by database trigger)
+    const passwordMatch = await bcrypt.compare(password, users.password)
+    if (!passwordMatch) {
+      return {
+        success: false,
+        error: 'Invalid email or password',
+      }
+    }
+
+    // Create session cookie with user data
+    await createSessionCookie({
+      id: users.id,
+      name: users.name,
+      email: users.email,
+      Role: users.Role,
+    })
+
+    return {
+      success: true,
+      message: 'Login successful',
+    }
+  } catch (error) {
+    console.error('Login error:', error)
+    return {
+      success: false,
+      error: 'An error occurred during login',
+    }
+  }
+}
+
+export async function logoutUser() {
+  try {
+    // Delete session cookie
+    await deleteSessionCookie()
+
+    return {
+      success: true,
+      message: 'Logged out successfully',
+    }
+  } catch (error) {
+    console.error('Logout error:', error)
+    return {
+      success: false,
+      error: 'An error occurred during logout',
+    }
+  }
+}
 
 // ============================================================================
 // METRICS QUERY

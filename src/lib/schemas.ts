@@ -158,3 +158,20 @@ export const createRatingFormSchema = z.object({
 })
 
 export type CreateRatingFormData = z.infer<typeof createRatingFormSchema>
+
+// Authentication Schemas
+export const loginFormSchema = z.object({
+  email: z.string().min(1, 'Email is required').email('Invalid email address'),
+  password: z.string().min(1, 'Password is required'),
+})
+
+export type LoginFormData = z.infer<typeof loginFormSchema>
+
+export const userLoginResponseSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  email: z.string(),
+  Role: z.string(),
+})
+
+export type UserLoginResponse = z.infer<typeof userLoginResponseSchema>
