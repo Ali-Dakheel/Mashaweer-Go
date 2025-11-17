@@ -37,7 +37,8 @@ export async function loginUser(email: string, password: string) {
     }
 
     // Check if user is admin
-    if (users.Role !== 'admin') {
+    if (users.Role !== 'Admin') {
+      console.log(users.Role)
       return {
         success: false,
         error: 'Only admin users can access this application',

@@ -13,7 +13,7 @@ function isValidSession(cookieValue: string | undefined): boolean {
       userData &&
       userData.id &&
       userData.email &&
-      userData.Role === 'admin' &&
+      userData.Role === 'Admin' &&
       userData.timestamp
     )
   } catch {

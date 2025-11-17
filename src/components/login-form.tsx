@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -33,20 +33,7 @@ export function LoginForm({
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
 
-  // Debug: Check for existing cookies on mount
-  useEffect(() => {
-    console.log('[LoginForm] Mounted')
-    console.log('[LoginForm] All cookies:', document.cookie)
-    
-    // Clear any stale admin_session cookie
-    if (document.cookie.includes('admin_session')) {
-      console.log('[LoginForm] Found admin_session cookie, clearing it...')
-      document.cookie = 'admin_session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT'
-      console.log('[LoginForm] Cookie cleared, refreshing page...')
-      // Force a page refresh to re-run middleware
-      window.location.reload()
-    }
-  }, [])
+
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -65,6 +52,28 @@ export function LoginForm({
         toast({
           title: 'Login Failed',
           description: result.error || 'An error occurred',
+          variant: 'destructive',
+        })
+        setIsLoading(false)
+        return
+      }
+
+      // Successful login
+      console.log('[LoginForm] Login successful!')
+      toast({
+        title: 'Success',
+        description: 'You have been logged in successfully',
+      })
+
+      // Redirect to dashboard
+      router.push('/')
+      router.refresh() // Force a refresh to update middleware
+    } catch (err) {
+      console.error('[LoginForm] Error:', err)
+      const message = err instanceof Error ? err.message : 'An error occurred'
+      setError(message)
+      toast({
+        title: 'Error',
         description: message,
         variant: 'destructive',
       })
